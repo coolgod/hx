@@ -21,7 +21,7 @@ html, body {
 
 /* Snap points need pointer-events to receive scroll */
 .snap-point {
-  height: 100vh;
+  height: calc(var(--vh, 1vh) * 100);
   pointer-events: none;
 }
 
@@ -29,6 +29,7 @@ html, body {
 .season-section {
   position: fixed;
   inset: 0;
+  height: calc(var(--vh, 1vh) * 100);
   will-change: opacity, transform;
 }
 

@@ -66,7 +66,7 @@ export function SeasonSection({ data, onPhotoClick, translateY, contentBlur, zIn
   return (
     <section
       id={data.season}
-      className={`season-section relative h-screen w-full flex flex-col items-center ${styles.bg}`}
+      className={`season-section relative w-full flex flex-col items-center ${styles.bg}`}
       style={{
         transform: `translateY(${translateY})`,
         zIndex,

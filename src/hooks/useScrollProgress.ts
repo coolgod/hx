@@ -44,8 +44,19 @@ export function useScrollProgress(numSections: number, isModalOpen: boolean) {
   }, [isModalOpen])
 
   useEffect(() => {
+    const setVh = () => {
+      document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`)
+    }
+    setVh()
+    window.addEventListener('resize', setVh)
+    return () => window.removeEventListener('resize', setVh)
+  }, [])
+
+  useEffect(() => {
     const el = trackRef.current
     if (!el) return
+
+    const getVh = () => window.innerHeight
 
     const onScroll = () => {
       const maxScroll = el.scrollHeight - el.clientHeight
@@ -60,7 +71,7 @@ export function useScrollProgress(numSections: number, isModalOpen: boolean) {
       if (clamped === currentIndex.current) return
       isAnimating.current = true
       const from = el.scrollTop
-      const to = clamped * el.clientHeight
+      const to = clamped * getVh()
       currentIndex.current = clamped
       animateScroll(el, from, to, DURATION, () => {
         isAnimating.current = false
