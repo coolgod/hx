@@ -48,7 +48,7 @@ export function PhotoModal({ photo, onClose }: Props) {
         {/* Image */}
         <picture>
           <img
-            src={photo.src}
+            src={import.meta.env.BASE_URL + photo.src}
             alt={photo.alt}
             className="w-full max-h-[55vh] object-contain rounded-md block"
           />

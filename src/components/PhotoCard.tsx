@@ -78,7 +78,7 @@ export function PhotoCard({ photo, season, pinOffset = 0, onClick }: Props) {
         {/* Photo */}
         <picture>
           <img
-            src={photo.src}
+            src={import.meta.env.BASE_URL + photo.src}
             alt={photo.alt}
             loading="lazy"
             className="block rounded-sm object-cover"
