@@ -45,11 +45,16 @@ export function useScrollProgress(numSections: number, isModalOpen: boolean) {
 
   useEffect(() => {
     const setVh = () => {
-      document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`)
+      const h = window.visualViewport ? window.visualViewport.height : window.innerHeight
+      document.documentElement.style.setProperty('--vh', `${h * 0.01}px`)
     }
     setVh()
+    window.visualViewport?.addEventListener('resize', setVh)
     window.addEventListener('resize', setVh)
-    return () => window.removeEventListener('resize', setVh)
+    return () => {
+      window.visualViewport?.removeEventListener('resize', setVh)
+      window.removeEventListener('resize', setVh)
+    }
   }, [])
 
   useEffect(() => {
