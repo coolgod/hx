@@ -59,9 +59,9 @@ export function useScrollProgress(numSections: number, isModalOpen: boolean) {
     const getVh = () => window.innerHeight
 
     const onScroll = () => {
-      const maxScroll = el.scrollHeight - el.clientHeight
+      const maxScroll = (numSections - 1) * getVh()
       if (maxScroll <= 0) return
-      const raw = (el.scrollTop / maxScroll) * (numSections - 1)
+      const raw = el.scrollTop / maxScroll * (numSections - 1)
       setProgress(Math.min(Math.max(raw, 0), numSections - 1))
     }
 
@@ -81,6 +81,7 @@ export function useScrollProgress(numSections: number, isModalOpen: boolean) {
     const onWheel = (e: WheelEvent) => {
       e.preventDefault()
       if (isModalOpenRef.current || isAnimating.current) return
+      if ((e.target as Element).closest('.photos-row')) return
       if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return
       if (e.deltaY > 0) {
         scrollToIndex(currentIndex.current + 1)
