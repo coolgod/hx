@@ -56,12 +56,13 @@ export function useScrollProgress(numSections: number, isModalOpen: boolean) {
     const el = trackRef.current
     if (!el) return
 
-    const getVh = () => window.innerHeight
+    const getSnapHeight = () => el.scrollHeight / numSections
 
     const onScroll = () => {
-      const maxScroll = (numSections - 1) * getVh()
+      const snapHeight = getSnapHeight()
+      const maxScroll = (numSections - 1) * snapHeight
       if (maxScroll <= 0) return
-      const raw = el.scrollTop / maxScroll * (numSections - 1)
+      const raw = el.scrollTop / snapHeight
       setProgress(Math.min(Math.max(raw, 0), numSections - 1))
     }
 
@@ -71,7 +72,7 @@ export function useScrollProgress(numSections: number, isModalOpen: boolean) {
       if (clamped === currentIndex.current) return
       isAnimating.current = true
       const from = el.scrollTop
-      const to = clamped * getVh()
+      const to = clamped * getSnapHeight()
       currentIndex.current = clamped
       animateScroll(el, from, to, DURATION, () => {
         isAnimating.current = false
