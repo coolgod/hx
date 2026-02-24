@@ -19,7 +19,7 @@ for (const s of seasonsData) {
 
 export default function App() {
   const [activePhoto, setActivePhoto] = useState<Photo | null>(null)
-  const { progress, trackRef } = useScrollProgress(seasonsData.length, activePhoto !== null)
+  const { progress, trackRef, scrollTo } = useScrollProgress(seasonsData.length, activePhoto !== null)
 
   const openModal = useCallback((id: string) => {
     setActivePhoto(photoMap.get(id) ?? null)
@@ -100,7 +100,7 @@ export default function App() {
       <PhotoModal photo={activePhoto} onClose={closeModal} />
 
       {/* Scroll hint chevrons */}
-      <ScrollHint progress={progress} total={seasonsData.length} hidden={activePhoto !== null} />
+      <ScrollHint progress={progress} total={seasonsData.length} hidden={activePhoto !== null} onScrollUp={() => scrollTo(Math.round(progress) - 1)} onScrollDown={() => scrollTo(Math.round(progress) + 1)} />
     </>
   )
 }

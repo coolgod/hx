@@ -38,22 +38,25 @@ export function useScrollProgress(numSections: number, isModalOpen: boolean) {
   const currentIndex = useRef(0)
   const touchStartY = useRef(0)
   const isModalOpenRef = useRef(isModalOpen)
+  const scrollToIndexRef = useRef<(index: number) => void>(() => {})
 
   useEffect(() => {
     isModalOpenRef.current = isModalOpen
   }, [isModalOpen])
 
   useEffect(() => {
+    const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent)
     const setVh = () => {
-      const h = window.visualViewport ? window.visualViewport.height : window.innerHeight
+      const h = (isIOS && window.visualViewport) ? window.visualViewport.height : window.innerHeight
       document.documentElement.style.setProperty('--vh', `${h * 0.01}px`)
     }
     setVh()
-    window.visualViewport?.addEventListener('resize', setVh)
-    window.addEventListener('resize', setVh)
-    return () => {
-      window.visualViewport?.removeEventListener('resize', setVh)
-      window.removeEventListener('resize', setVh)
+    if (isIOS && window.visualViewport) {
+      window.visualViewport.addEventListener('resize', setVh)
+      return () => window.visualViewport!.removeEventListener('resize', setVh)
+    } else {
+      window.addEventListener('resize', setVh)
+      return () => window.removeEventListener('resize', setVh)
     }
   }, [])
 
@@ -83,6 +86,7 @@ export function useScrollProgress(numSections: number, isModalOpen: boolean) {
         isAnimating.current = false
       })
     }
+    scrollToIndexRef.current = scrollToIndex
 
     const onWheel = (e: WheelEvent) => {
       e.preventDefault()
@@ -126,7 +130,9 @@ export function useScrollProgress(numSections: number, isModalOpen: boolean) {
     }
   }, [numSections])
 
-  return { progress, trackRef }
+  const scrollTo = (index: number) => scrollToIndexRef.current(index)
+
+  return { progress, trackRef, scrollTo }
 }
 
 /**
