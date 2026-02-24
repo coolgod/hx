@@ -19,7 +19,7 @@ for (const s of seasonsData) {
 
 export default function App() {
   const [activePhoto, setActivePhoto] = useState<Photo | null>(null)
-  const { progress, trackRef } = useScrollProgress(seasonsData.length)
+  const { progress, trackRef } = useScrollProgress(seasonsData.length, activePhoto !== null)
 
   const openModal = useCallback((id: string) => {
     setActivePhoto(photoMap.get(id) ?? null)

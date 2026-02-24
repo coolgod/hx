@@ -31,12 +31,17 @@ function animateScroll(
   requestAnimationFrame(tick)
 }
 
-export function useScrollProgress(numSections: number) {
+export function useScrollProgress(numSections: number, isModalOpen: boolean) {
   const [progress, setProgress] = useState(0)
   const trackRef = useRef<HTMLDivElement>(null)
   const isAnimating = useRef(false)
   const currentIndex = useRef(0)
   const touchStartY = useRef(0)
+  const isModalOpenRef = useRef(isModalOpen)
+
+  useEffect(() => {
+    isModalOpenRef.current = isModalOpen
+  }, [isModalOpen])
 
   useEffect(() => {
     const el = trackRef.current
@@ -64,7 +69,8 @@ export function useScrollProgress(numSections: number) {
 
     const onWheel = (e: WheelEvent) => {
       e.preventDefault()
-      if (isAnimating.current) return
+      if (isModalOpenRef.current || isAnimating.current) return
+      if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return
       if (e.deltaY > 0) {
         scrollToIndex(currentIndex.current + 1)
       } else if (e.deltaY < 0) {
@@ -77,7 +83,7 @@ export function useScrollProgress(numSections: number) {
     }
 
     const onTouchEnd = (e: TouchEvent) => {
-      if (isAnimating.current) return
+      if (isModalOpenRef.current || isAnimating.current) return
       const deltaY = touchStartY.current - e.changedTouches[0].clientY
       if (Math.abs(deltaY) > 30) {
         if (deltaY > 0) {
