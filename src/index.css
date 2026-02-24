@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Fallback background — prevents white flash if all sections are briefly transparent */
+html, body {
+  background: #1a1a1a;
+  margin: 0;
+  height: 100%;
+}
+
+/* Scroll container — snap driven by JS, not CSS */
+#scroll-track {
+  position: fixed;
+  inset: 0;
+  overflow-y: scroll;
+  z-index: 1000;
+  background: transparent;
+  pointer-events: none;
+}
+
+/* Snap points need pointer-events to receive scroll */
+.snap-point {
+  height: 100vh;
+  pointer-events: none;
+}
+
+/* Each season is fixed to the viewport and crossfades */
+.season-section {
+  position: fixed;
+  inset: 0;
+  will-change: opacity, transform;
+}
+
+/* Hide horizontal scrollbar on photo rows */
+.photos-row::-webkit-scrollbar { display: none; }
+.photos-row { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Photo card natural slight rotations — applied to wrapper */
+.photo-card-wrapper:nth-child(odd)  .photo-card { transform: rotate(-2.5deg); }
+.photo-card-wrapper:nth-child(even) .photo-card { transform: rotate(2deg); }
+.photo-card-wrapper:nth-child(3n)   .photo-card { transform: rotate(-1.2deg); }
+
+.photo-card {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  position: relative;
+}
+.photo-card-wrapper:hover .photo-card {
+  transform: rotate(0deg) scale(1.06) translateY(-6px) !important;
+  z-index: 10;
+}
+.photo-card-wrapper {
+  cursor: pointer;
+}
+
+/* Scroll hint chevron bounce */
+@keyframes chevronBounce {
+  0%        { transform: translateY(0);   opacity: 0;    }
+  10%       { transform: translateY(0);   opacity: 0.8;  }
+  30%       { transform: translateY(6px); opacity: 1;    }
+  50%       { transform: translateY(0);   opacity: 0.8;  }
+  60%       { transform: translateY(0);   opacity: 0;    }
+  100%      { transform: translateY(0);   opacity: 0;    }
+}
+.chevron-bounce {
+  animation: chevronBounce 3s ease-in-out infinite;
+}
+
+/* Flip direction for up-chevron */
+@keyframes chevronBounceUp {
+  0%        { transform: translateY(0);    opacity: 0;    }
+  10%       { transform: translateY(0);    opacity: 0.8;  }
+  30%       { transform: translateY(-6px); opacity: 1;    }
+  50%       { transform: translateY(0);    opacity: 0.8;  }
+  60%       { transform: translateY(0);    opacity: 0;    }
+  100%      { transform: translateY(0);    opacity: 0;    }
+}
+.chevron-bounce-up {
+  animation: chevronBounceUp 3s ease-in-out infinite;
+}
