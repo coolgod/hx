@@ -105,7 +105,7 @@ export function Clothesline({ data, onPhotoClick }: Props) {
       <div
         ref={rowRef}
         className="photos-row w-full -mt-3"
-        style={{ overflowX: 'auto', overflowY: 'visible', cursor: 'grab', userSelect: 'none' }}
+        style={{ overflowX: 'auto', overflowY: 'hidden', cursor: 'grab', userSelect: 'none', touchAction: 'pan-x', overscrollBehavior: 'contain' }}
         onMouseDown={onMouseDown}
         onMouseMove={onMouseMove}
         onMouseUp={onMouseUp}

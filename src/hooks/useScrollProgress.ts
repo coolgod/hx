@@ -106,6 +106,7 @@ export function useScrollProgress(numSections: number, isModalOpen: boolean) {
 
     const onTouchEnd = (e: TouchEvent) => {
       if (isModalOpenRef.current || isAnimating.current) return
+      if ((e.target as Element).closest('.photos-row')) return
       const deltaY = touchStartY.current - e.changedTouches[0].clientY
       if (Math.abs(deltaY) > 30) {
         if (deltaY > 0) {
