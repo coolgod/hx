@@ -1,16 +1,31 @@
-import { useRef, useState, useCallback } from 'react'
+import { useRef, useState, useCallback, useImperativeHandle, forwardRef } from 'react'
 
-interface Props {
-  audioSrc?: string
+const AUDIO_SRC = import.meta.env.BASE_URL + 'audio/background.m4a'
+
+export interface AudioControllerHandle {
+  play: () => void
 }
 
-export function AudioController({ audioSrc }: Props) {
+export const AudioController = forwardRef<AudioControllerHandle>(function AudioController(_, ref) {
   const audioRef = useRef<HTMLAudioElement>(null)
   const [playing, setPlaying] = useState(false)
 
+  useImperativeHandle(ref, () => ({
+    play: async () => {
+      const audio = audioRef.current
+      if (!audio) return
+      try {
+        await audio.play()
+        setPlaying(true)
+      } catch {
+        // Autoplay blocked — should not happen if called from user gesture
+      }
+    },
+  }), [])
+
   const toggle = useCallback(async () => {
     const audio = audioRef.current
-    if (!audio || !audioSrc) return
+    if (!audio) return
 
     if (!audio.paused) {
       audio.pause()
@@ -20,22 +35,21 @@ export function AudioController({ audioSrc }: Props) {
         await audio.play()
         setPlaying(true)
       } catch {
-        // Autoplay blocked — user gesture already happened here so this
-        // branch is unlikely, but guard gracefully.
+        // Autoplay blocked
       }
     }
-  }, [audioSrc])
+  }, [])
 
   return (
     <>
-      <audio ref={audioRef} loop preload="none">
-        {audioSrc && <source src={audioSrc} type="audio/mpeg" />}
+      <audio ref={audioRef} loop preload="auto">
+        <source src={AUDIO_SRC} type="audio/mp4" />
       </audio>
 
       <button
         onClick={toggle}
         aria-label={playing ? 'Pause music' : 'Play music'}
-        title={audioSrc ? (playing ? 'Pause music' : 'Play music') : 'No audio track yet'}
+        title={playing ? 'Pause music' : 'Play music'}
         className={`
           fixed top-4 right-5 z-50
           w-10 h-10 rounded-full
@@ -45,11 +59,11 @@ export function AudioController({ audioSrc }: Props) {
           shadow-md border border-white/40
           transition-all duration-200
           hover:bg-white/85
-          ${!audioSrc ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}
+          cursor-pointer
         `}
       >
         {playing ? '⏸' : '♪'}
       </button>
     </>
   )
-}
+})

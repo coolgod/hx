@@ -1,8 +1,9 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import React from 'react'
 import { SeasonSection } from './components/SeasonSection'
 import { PhotoModal } from './components/PhotoModal'
 import { AudioController } from './components/AudioController'
+import type { AudioControllerHandle } from './components/AudioController'
 import { SeamBlur } from './components/SeamBlur'
 import { LoadingScreen } from './components/LoadingScreen'
 import { seasonsData } from './data/photos'
@@ -31,11 +32,18 @@ export default function App() {
   const { progress, trackRef, scrollTo } = useScrollProgress(seasonsData.length, activePhoto !== null)
   const { progress: loadProgress, ready: loadReady } = useImagePreloader(allImageUrls)
   const [showLoading, setShowLoading] = useState(true)
+  const audioRef = useRef<AudioControllerHandle>(null)
 
-  // Safety timeout: dismiss loading after 10s regardless
+  // Safety timeout: force-ready after 10s regardless
   useEffect(() => {
     const timer = setTimeout(() => setShowLoading(false), 10_000)
     return () => clearTimeout(timer)
+  }, [])
+
+  const handleEnter = useCallback(() => {
+    audioRef.current?.play()
+    // Small delay so fade-out animation plays before unmount
+    setTimeout(() => setShowLoading(false), 650)
   }, [])
 
   const openModal = useCallback((id: string) => {
@@ -61,12 +69,12 @@ export default function App() {
         <LoadingScreen
           progress={loadProgress}
           ready={loadReady}
-          onTransitionEnd={() => setShowLoading(false)}
+          onEnter={handleEnter}
         />
       )}
 
       {/* Music toggle */}
-      <AudioController /* audioSrc="/audio/track.mp3" */ />
+      <AudioController ref={audioRef} />
 
       {/*
         Scroll track — snap container, one 100vh snap point per season.
