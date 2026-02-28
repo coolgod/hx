@@ -80,7 +80,6 @@ export function PhotoCard({ photo, season, pinOffset = 0, onClick }: Props) {
           <img
             src={import.meta.env.BASE_URL + photo.src}
             alt={photo.alt}
-            loading="lazy"
             className="block rounded-sm object-cover"
             style={{ width: 'clamp(100px, 14vw, 180px)', aspectRatio: '4/5' }}
           />

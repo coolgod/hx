@@ -1,12 +1,14 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import React from 'react'
 import { SeasonSection } from './components/SeasonSection'
 import { PhotoModal } from './components/PhotoModal'
 import { AudioController } from './components/AudioController'
 import { SeamBlur } from './components/SeamBlur'
+import { LoadingScreen } from './components/LoadingScreen'
 import { seasonsData } from './data/photos'
 import type { Photo } from './data/photos'
 import { useScrollProgress, getSectionStyle } from './hooks/useScrollProgress'
+import { useImagePreloader } from './hooks/useImagePreloader'
 import { ScrollHint } from './components/ScrollHint'
 
 // Build a flat lookup map for quick photo retrieval
@@ -17,9 +19,24 @@ for (const s of seasonsData) {
   }
 }
 
+// Collect all image URLs for preloading
+const BASE = import.meta.env.BASE_URL
+const allImageUrls: string[] = [
+  ...['spring', 'summer', 'autumn', 'winter'].map(s => `${BASE}bg/${s}.webp`),
+  ...seasonsData.flatMap(s => s.photos.map(p => `${BASE}${p.src}`)),
+]
+
 export default function App() {
   const [activePhoto, setActivePhoto] = useState<Photo | null>(null)
   const { progress, trackRef, scrollTo } = useScrollProgress(seasonsData.length, activePhoto !== null)
+  const { progress: loadProgress, ready: loadReady } = useImagePreloader(allImageUrls)
+  const [showLoading, setShowLoading] = useState(true)
+
+  // Safety timeout: dismiss loading after 10s regardless
+  useEffect(() => {
+    const timer = setTimeout(() => setShowLoading(false), 10_000)
+    return () => clearTimeout(timer)
+  }, [])
 
   const openModal = useCallback((id: string) => {
     setActivePhoto(photoMap.get(id) ?? null)
@@ -40,6 +57,14 @@ export default function App() {
 
   return (
     <>
+      {showLoading && (
+        <LoadingScreen
+          progress={loadProgress}
+          ready={loadReady}
+          onTransitionEnd={() => setShowLoading(false)}
+        />
+      )}
+
       {/* Music toggle */}
       <AudioController /* audioSrc="/audio/track.mp3" */ />
 
